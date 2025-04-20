@@ -7,6 +7,11 @@ import { redirect } from "next/navigation";
 export async function logInAction() {
   const supabase = await createServerClient();
 
+  console.log(
+    "Logging in with Spotify, passing redirectTo:",
+    `${siteUrl}/auth/callback`
+  );
+
   const { data } = await supabase.auth.signInWithOAuth({
     provider: "spotify",
     options: {
@@ -15,6 +20,7 @@ export async function logInAction() {
   });
 
   if (data.url) {
+    console.log("Redirecting to:", data.url);
     redirect(data.url);
   }
 }
