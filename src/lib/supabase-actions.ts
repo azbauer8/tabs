@@ -4,7 +4,7 @@ import { siteUrl } from "@/lib/utils";
 import { createServerClient } from "@/lib/supabase-clients";
 import { redirect } from "next/navigation";
 
-export async function signInAction() {
+export async function logInAction() {
   const supabase = await createServerClient();
 
   const { data } = await supabase.auth.signInWithOAuth({
@@ -19,7 +19,7 @@ export async function signInAction() {
   }
 }
 
-export async function signOutAction() {
+export async function logOutAction() {
   const supabase = await createServerClient();
   await supabase.auth.signOut();
   return redirect("/");

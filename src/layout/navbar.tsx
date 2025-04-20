@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "./theme-toggle";
-import { signInAction, signOutAction } from "@/lib/supabase-actions";
+import { logInAction, logOutAction } from "@/lib/supabase-actions";
 import { createServerClient } from "@/lib/supabase-clients";
 import {
   DropdownMenu,
@@ -21,6 +21,8 @@ import {
   LogOut,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { SpotifyLogo } from "@/components/spotify-logo";
+import { LoginButton } from "@/layout/login-button";
 
 export async function Navbar() {
   return (
@@ -45,10 +47,8 @@ async function UserMenu() {
 
   if (!authUser.data.user) {
     return (
-      <form action={signInAction}>
-        <Button size="sm" variant="outline" type="submit">
-          Log In
-        </Button>
+      <form action={logInAction}>
+        <LoginButton />
       </form>
     );
   }
@@ -64,8 +64,8 @@ async function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="size-8 border-none p-0">
-          <Avatar className="rounded-md outline outline-border">
+        <Button variant="outline" size="sm" className="p-0 overflow-hidden">
+          <Avatar className="rounded-none size-full">
             <AvatarImage src={avatar} alt={fullName} />
             <AvatarFallback className="rounded-md">{initials}</AvatarFallback>
           </Avatar>
@@ -74,9 +74,9 @@ async function UserMenu() {
       <DropdownMenuContent className="w-56" align="end">
         <DropdownMenuLabel className="p-0 font-normal">
           <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-            <Avatar>
+            <Avatar className="rounded-md outline">
               <AvatarImage src={avatar} alt={fullName} />
-              <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
+              <AvatarFallback className="rounded-md">{initials}</AvatarFallback>
             </Avatar>
             <div className="grid flex-1 text-left text-sm leading-tight">
               <span className="truncate font-semibold">{fullName}</span>
@@ -87,11 +87,11 @@ async function UserMenu() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <form action={signOutAction}>
+        <form action={logOutAction}>
           <DropdownMenuItem className="gap-2 w-full" asChild>
             <button type="submit">
               <LogOut className="size-4" />
-              Sign Out
+              Log Out
             </button>
           </DropdownMenuItem>
         </form>

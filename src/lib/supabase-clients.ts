@@ -2,9 +2,10 @@ import { createServerClient as createSClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { createBrowserClient as createBClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
+import { Database } from "@/lib/supabase.types";
 
 export function createBrowserClient() {
-  createBClient(
+  createBClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
@@ -13,7 +14,7 @@ export function createBrowserClient() {
 export async function createServerClient() {
   const cookieStore = await cookies();
 
-  return createSClient(
+  return createSClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -48,7 +49,7 @@ export async function updateSession(request: NextRequest) {
       },
     });
 
-    const supabase = createSClient(
+    const supabase = createSClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
