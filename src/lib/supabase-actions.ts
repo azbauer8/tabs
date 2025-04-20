@@ -15,7 +15,7 @@ export async function logInAction() {
   const { data } = await supabase.auth.signInWithOAuth({
     provider: "spotify",
     options: {
-      redirectTo: `https://tabs.byzach.dev/auth/callback`,
+      redirectTo: `${siteUrl}/auth/callback`,
     },
   });
 
