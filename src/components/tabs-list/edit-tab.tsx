@@ -137,7 +137,7 @@ export function EditTabDialog({
                               </Button>
                             </TooltipTrigger>
                             <TooltipContent>
-                              Autofill Tab Info from Spotify
+                              Autofill Song Info from Spotify
                             </TooltipContent>
                           </Tooltip>
                         </TooltipProvider>
