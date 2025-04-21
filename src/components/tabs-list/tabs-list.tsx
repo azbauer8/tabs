@@ -1,7 +1,9 @@
 import { AddTabDialog } from "@/components/tabs-list/add-tab";
 import { TabCard } from "@/components/tabs-list/tab-card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { createServerClient } from "@/lib/supabase-clients";
 import { User } from "@supabase/supabase-js";
+import { FrownIcon } from "lucide-react";
 
 export async function TabsList({ authUser }: { authUser: User }) {
   const supabase = await createServerClient();
@@ -9,7 +11,8 @@ export async function TabsList({ authUser }: { authUser: User }) {
   const { data: tabs } = await supabase
     .from("Tabs")
     .select()
-    .eq("creator", authUser.id);
+    .eq("creator", authUser.id)
+    .order("created_at", { ascending: false });
 
   return (
     <div className="flex flex-col gap-6">
@@ -24,7 +27,14 @@ export async function TabsList({ authUser }: { authUser: User }) {
           ))}
         </div>
       ) : (
-        <div>no tabs yet</div>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex flex-col gap-4 items-center text-lg">
+              <FrownIcon className="size-12 text-muted-foreground" />
+              No tabs found
+            </CardTitle>
+          </CardHeader>
+        </Card>
       )}
     </div>
   );

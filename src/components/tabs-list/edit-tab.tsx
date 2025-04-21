@@ -11,7 +11,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { PlusCircle, Wand2Icon } from "lucide-react";
+import { Wand2Icon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -21,7 +21,6 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
 } from "@/components/ui/form";
 import {
   Tooltip,
@@ -30,11 +29,12 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { getSpotifyInfoFromLink } from "@/lib/spotify-actions";
-import { addTab } from "@/lib/supabase-actions";
+import { deleteTab, editTab } from "@/lib/supabase-actions";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Tables } from "@/lib/supabase.types";
 
-export const addTabFormSchema = z.object({
+export const editTabFormSchema = z.object({
   songLink: z.string().url().min(1),
   tabLink: z.string().url().min(1),
   title: z.string().min(1),
@@ -42,53 +42,54 @@ export const addTabFormSchema = z.object({
   artLink: z.string().url().optional(),
 });
 
-export function AddTabDialog() {
-  const [isOpen, setIsOpen] = useState(false);
+export function EditTabDialog({
+  tab,
+  open,
+  setOpen,
+}: {
+  tab: Tables<"Tabs">;
+  open: boolean;
+  setOpen: (open: boolean) => void;
+}) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isDoingMagic, setIsDoingMagic] = useState(false);
 
-  const form = useForm<z.infer<typeof addTabFormSchema>>({
-    resolver: zodResolver(addTabFormSchema),
+  const form = useForm<z.infer<typeof editTabFormSchema>>({
+    resolver: zodResolver(editTabFormSchema),
     defaultValues: {
-      songLink: "",
-      tabLink: "",
-      title: "",
-      artist: "",
-      artLink: "",
+      songLink: tab.spotify_link,
+      tabLink: tab.tab_link,
+      title: tab.title,
+      artist: tab.artist ?? undefined,
+      artLink: tab.art_link ?? undefined,
     },
   });
 
-  async function onSubmit(values: z.infer<typeof addTabFormSchema>) {
+  async function onSubmit(values: z.infer<typeof editTabFormSchema>) {
     setIsSubmitting(true);
-    const result = await addTab(values);
+    const result = await editTab(tab.id, values);
     setIsSubmitting(false);
     if (result?.error) {
-      toast.error("Error adding tab: " + result.error.message);
+      toast.error("Error editing tab: " + result.error.message);
       return;
     }
     form.reset();
-    setIsOpen(false);
+    setOpen(false);
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button size="sm" variant="outline">
-          <PlusCircle className="size-4" />
-          Add
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild></DialogTrigger>
       <DialogContent>
-        <DialogDescription className="sr-only">
-          Add a new tab to your list. Fill in the required fields and click "Add
-          Tab" to submit your request.
-        </DialogDescription>
+        <DialogDescription className="sr-only">Edit Tab Info</DialogDescription>
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
             className="flex flex-col gap-6"
           >
             <DialogHeader>
-              <DialogTitle>Add Tab</DialogTitle>
+              <DialogTitle>Edit Tab</DialogTitle>
             </DialogHeader>
             <div className="flex flex-col gap-4">
               <FormField
@@ -115,7 +116,9 @@ export function AddTabDialog() {
                                 size="icon"
                                 className="size-fit p-2"
                                 type="button"
+                                disabled={isDoingMagic}
                                 onClick={async () => {
+                                  setIsDoingMagic(true);
                                   const link = field.value;
                                   const songData =
                                     await getSpotifyInfoFromLink(link);
@@ -130,6 +133,7 @@ export function AddTabDialog() {
                                       songData.album.images[0].url
                                     );
                                   }
+                                  setIsDoingMagic(false);
                                 }}
                               >
                                 <Wand2Icon />
@@ -228,8 +232,26 @@ export function AddTabDialog() {
               />
             </div>
             <DialogFooter>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Adding Tab..." : "Add Tab"}
+              <Button
+                type="button"
+                variant="destructive"
+                disabled={isDeleting || isSubmitting}
+                onClick={async () => {
+                  setIsDeleting(true);
+                  const result = await deleteTab(tab.id);
+                  setIsDeleting(false);
+                  if (result?.error) {
+                    toast.error("Error deleting tab: " + result.error.message);
+                    return;
+                  }
+                  form.reset();
+                  setOpen(false);
+                }}
+              >
+                {isDeleting ? "Deleting Tab..." : "Delete Tab"}
+              </Button>
+              <Button type="submit" disabled={isDeleting || isSubmitting}>
+                {isSubmitting ? "Editing Tab..." : "Edit Tab"}
               </Button>
             </DialogFooter>
           </form>

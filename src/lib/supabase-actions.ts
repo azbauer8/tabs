@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { addTabFormSchema } from "@/components/tabs-list/add-tab";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
+import { editTabFormSchema } from "@/components/tabs-list/edit-tab";
 
 export async function logInAction() {
   const supabase = await createServerClient();
@@ -38,13 +39,41 @@ export async function addTab(formData: z.infer<typeof addTabFormSchema>) {
     tab_link: formData.tabLink,
     title: formData.title,
     artist: formData.artist,
-    album: formData.album,
-    release_year: formData.releaseYear
-      ? parseInt(formData.releaseYear)
-      : undefined,
     art_link: formData.artLink,
   });
-  if (data) {
+  if (!error) {
+    revalidatePath("/", "layout");
+  }
+  return { data, error };
+}
+
+export async function editTab(
+  tabId: number,
+  formData: z.infer<typeof editTabFormSchema>
+) {
+  const supabase = await createServerClient();
+  const authUser = await supabase.auth.getUser();
+  if (!authUser.data.user) return;
+  const { data, error } = await supabase.from("Tabs").upsert({
+    id: tabId,
+    creator: authUser.data.user.id,
+    spotify_link: formData.songLink,
+    tab_link: formData.tabLink,
+    title: formData.title,
+    artist: formData.artist,
+    art_link: formData.artLink,
+  });
+  if (!error) {
+    revalidatePath("/", "layout");
+  }
+  return { data, error };
+}
+
+export async function deleteTab(tabId: number) {
+  const supabase = await createServerClient();
+  const { data, error } = await supabase.from("Tabs").delete().eq("id", tabId);
+
+  if (!error) {
     revalidatePath("/", "layout");
   }
   return { data, error };

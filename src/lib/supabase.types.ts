@@ -27,40 +27,34 @@ export type Database = {
       };
       Tabs: {
         Row: {
-          album: string | null;
           art_link: string | null;
           artist: string | null;
           created_at: string;
           creator: string;
           group_id: number | null;
           id: number;
-          release_year: number | null;
           spotify_link: string;
           tab_link: string;
           title: string;
         };
         Insert: {
-          album?: string | null;
           art_link?: string | null;
           artist?: string | null;
           created_at?: string;
           creator: string;
           group_id?: number | null;
           id?: number;
-          release_year?: number | null;
           spotify_link: string;
           tab_link: string;
           title: string;
         };
         Update: {
-          album?: string | null;
           art_link?: string | null;
           artist?: string | null;
           created_at?: string;
           creator?: string;
           group_id?: number | null;
           id?: number;
-          release_year?: number | null;
           spotify_link?: string;
           tab_link?: string;
           title?: string;
