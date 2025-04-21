@@ -7,7 +7,14 @@ import { Database } from "@/lib/supabase.types";
 export function createBrowserClient() {
   createBClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      global: {
+        fetch: (url: any, options = {}) => {
+          return fetch(url, { ...options, cache: "no-store" });
+        },
+      },
+    }
   );
 }
 
@@ -18,6 +25,11 @@ export async function createServerClient() {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
+      global: {
+        fetch: (url: any, options = {}) => {
+          return fetch(url, { ...options, cache: "no-store" });
+        },
+      },
       cookies: {
         getAll() {
           return cookieStore.getAll();
@@ -46,6 +58,11 @@ export async function updateSession(request: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
+      global: {
+        fetch: (url: any, options = {}) => {
+          return fetch(url, { ...options, cache: "no-store" });
+        },
+      },
       cookies: {
         getAll() {
           return request.cookies.getAll();

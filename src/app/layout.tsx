@@ -3,6 +3,7 @@ import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import { Navbar } from "@/layout/navbar";
 import { siteUrl } from "@/lib/utils";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata = {
   metadataBase: new URL(siteUrl),
@@ -35,6 +36,7 @@ export default function RootLayout({
               {children}
             </main>
           </div>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
