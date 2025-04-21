@@ -38,7 +38,7 @@ export const editTabFormSchema = z.object({
   songLink: z.string().url().min(1),
   tabLink: z.string().url().min(1),
   title: z.string().min(1),
-  artist: z.string().min(1),
+  artist: z.string().min(1).optional(),
   artLink: z.string().url().optional(),
 });
 
@@ -51,8 +51,8 @@ export function EditTabDialog({
   open: boolean;
   setOpen: (open: boolean) => void;
 }) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [isEditingTab, setIsEditingTab] = useState(false);
+  const [isDeletingTab, setIsDeletingTab] = useState(false);
   const [isDoingMagic, setIsDoingMagic] = useState(false);
 
   const form = useForm<z.infer<typeof editTabFormSchema>>({
@@ -67,9 +67,9 @@ export function EditTabDialog({
   });
 
   async function onSubmit(values: z.infer<typeof editTabFormSchema>) {
-    setIsSubmitting(true);
+    setIsEditingTab(true);
     const result = await editTab(tab.id, values);
-    setIsSubmitting(false);
+    setIsEditingTab(false);
     if (result?.error) {
       toast.error("Error editing tab: " + result.error.message);
       return;
@@ -98,10 +98,7 @@ export function EditTabDialog({
                 render={({ field }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center gap-2">
-                      <FormLabel>
-                        Song Link
-                        <span className="text-red-400 text-base pl-1">*</span>
-                      </FormLabel>
+                      <FormLabel>Song Link</FormLabel>
                       <div className="col-span-3 flex items-center gap-2">
                         <FormControl>
                           <Input
@@ -155,10 +152,7 @@ export function EditTabDialog({
                 render={({ field }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center gap-2">
-                      <FormLabel>
-                        Tab Link
-                        <span className="text-red-400 text-base pl-1">*</span>
-                      </FormLabel>
+                      <FormLabel>Tab Link</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="https://tabs.ultimate-guitar.com/tab/..."
@@ -176,10 +170,7 @@ export function EditTabDialog({
                 render={({ field }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center gap-2">
-                      <FormLabel>
-                        Title
-                        <span className="text-red-400 text-base pl-1">*</span>
-                      </FormLabel>
+                      <FormLabel>Title</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="Never Gonna Give You Up"
@@ -197,10 +188,7 @@ export function EditTabDialog({
                 render={({ field }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center gap-2">
-                      <FormLabel>
-                        Artist
-                        <span className="text-red-400 text-base pl-1">*</span>
-                      </FormLabel>
+                      <FormLabel>Artist</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="Rick Astley"
@@ -235,11 +223,11 @@ export function EditTabDialog({
               <Button
                 type="button"
                 variant="destructive"
-                disabled={isDeleting || isSubmitting}
+                disabled={isDeletingTab || isEditingTab}
                 onClick={async () => {
-                  setIsDeleting(true);
+                  setIsDeletingTab(true);
                   const result = await deleteTab(tab.id);
-                  setIsDeleting(false);
+                  setIsDeletingTab(false);
                   if (result?.error) {
                     toast.error("Error deleting tab: " + result.error.message);
                     return;
@@ -248,10 +236,10 @@ export function EditTabDialog({
                   setOpen(false);
                 }}
               >
-                {isDeleting ? "Deleting Tab..." : "Delete Tab"}
+                {isDeletingTab ? "Deleting Tab..." : "Delete Tab"}
               </Button>
-              <Button type="submit" disabled={isDeleting || isSubmitting}>
-                {isSubmitting ? "Editing Tab..." : "Edit Tab"}
+              <Button type="submit" disabled={isDeletingTab || isEditingTab}>
+                {isEditingTab ? "Editing Tab..." : "Edit Tab"}
               </Button>
             </DialogFooter>
           </form>

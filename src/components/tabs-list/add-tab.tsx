@@ -38,13 +38,14 @@ export const addTabFormSchema = z.object({
   songLink: z.string().url().min(1),
   tabLink: z.string().url().min(1),
   title: z.string().min(1),
-  artist: z.string().min(1),
+  artist: z.string().min(1).optional(),
   artLink: z.string().url().optional(),
 });
 
 export function AddTabDialog() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAddingTab, setIsAddingTab] = useState(false);
+  const [isDoingMagic, setIsDoingMagic] = useState(false);
 
   const form = useForm<z.infer<typeof addTabFormSchema>>({
     resolver: zodResolver(addTabFormSchema),
@@ -58,9 +59,9 @@ export function AddTabDialog() {
   });
 
   async function onSubmit(values: z.infer<typeof addTabFormSchema>) {
-    setIsSubmitting(true);
+    setIsAddingTab(true);
     const result = await addTab(values);
-    setIsSubmitting(false);
+    setIsAddingTab(false);
     if (result?.error) {
       toast.error("Error adding tab: " + result.error.message);
       return;
@@ -97,10 +98,7 @@ export function AddTabDialog() {
                 render={({ field }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center gap-2">
-                      <FormLabel>
-                        Song Link
-                        <span className="text-red-400 text-base pl-1">*</span>
-                      </FormLabel>
+                      <FormLabel>Song Link</FormLabel>
                       <div className="col-span-3 flex items-center gap-2">
                         <FormControl>
                           <Input
@@ -115,7 +113,9 @@ export function AddTabDialog() {
                                 size="icon"
                                 className="size-fit p-2"
                                 type="button"
+                                disabled={isDoingMagic}
                                 onClick={async () => {
+                                  setIsDoingMagic(true);
                                   const link = field.value;
                                   const songData =
                                     await getSpotifyInfoFromLink(link);
@@ -130,6 +130,7 @@ export function AddTabDialog() {
                                       songData.album.images[0].url
                                     );
                                   }
+                                  setIsDoingMagic(false);
                                 }}
                               >
                                 <Wand2Icon />
@@ -151,10 +152,7 @@ export function AddTabDialog() {
                 render={({ field }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center gap-2">
-                      <FormLabel>
-                        Tab Link
-                        <span className="text-red-400 text-base pl-1">*</span>
-                      </FormLabel>
+                      <FormLabel>Tab Link</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="https://tabs.ultimate-guitar.com/tab/..."
@@ -172,10 +170,7 @@ export function AddTabDialog() {
                 render={({ field }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center gap-2">
-                      <FormLabel>
-                        Title
-                        <span className="text-red-400 text-base pl-1">*</span>
-                      </FormLabel>
+                      <FormLabel>Title</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="Never Gonna Give You Up"
@@ -193,10 +188,7 @@ export function AddTabDialog() {
                 render={({ field }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center gap-2">
-                      <FormLabel>
-                        Artist
-                        <span className="text-red-400 text-base pl-1">*</span>
-                      </FormLabel>
+                      <FormLabel>Artist</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="Rick Astley"
@@ -228,8 +220,8 @@ export function AddTabDialog() {
               />
             </div>
             <DialogFooter>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Adding Tab..." : "Add Tab"}
+              <Button type="submit" disabled={isAddingTab}>
+                {isAddingTab ? "Adding Tab..." : "Add Tab"}
               </Button>
             </DialogFooter>
           </form>
