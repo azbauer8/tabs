@@ -40,56 +40,60 @@ export function TabCard({ tab }: { tab: Tables<"Tabs"> }) {
           )}
         </div>
 
-        <div className="flex gap-2 flex-1 min-w-0">
-          <div className="flex-1 flex flex-col justify-between">
+        <div className="flex flex-col gap-2 flex-1 min-w-0">
+          <div className="flex justify-between gap-4">
             <div>
               <h3 className="font-bold text-base line-clamp-1">{tab.title}</h3>
               <p className="text-sm text-muted-foreground line-clamp-1">
                 {tab.artist}
               </p>
             </div>
-            <div className="flex items-center justify-between">
-              <p className="text-xs text-muted-foreground">
-                Added {formattedDate}
-              </p>
-            </div>
-          </div>
-          <div className="flex gap-1 flex-col md:flex-row items-end md:items-start">
             <Button
               variant="outline"
               size="icon"
-              className="h-full w-fit py-1 px-2 md:size-7"
-              asChild
-            >
-              <a
-                href={tab.spotify_link}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <SpotifyLogo className="size-3.5 shrink-0" />
-                <span className="md:hidden">Song</span>
-              </a>
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-full w-fit py-1 px-2 md:size-7"
-              asChild
-            >
-              <a href={tab.tab_link} target="_blank" rel="noopener noreferrer">
-                <Play className="size-3.5 shrink-0" />
-                <span className="md:hidden">Tab</span>
-              </a>
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-full w-fit py-1 px-2 md:size-7"
+              className="py-1 px-2 size-fit md:size-7"
               onClick={() => setEditDialogOpen(true)}
             >
               <Pencil className="size-4 shrink-0" />
               <span className="md:hidden">Edit</span>
             </Button>
+          </div>
+          <div className="flex items-end justify-between gap-4">
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-full w-fit py-1 px-2"
+                asChild
+              >
+                <a
+                  href={tab.spotify_link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <SpotifyLogo className="size-3.5 shrink-0" />
+                  Song
+                </a>
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-full w-fit py-1 px-2 "
+                asChild
+              >
+                <a
+                  href={tab.tab_link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Play className="size-3.5 shrink-0" />
+                  Tab
+                </a>
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground text-right">
+              Added {formattedDate}
+            </p>
           </div>
         </div>
       </CardContent>
